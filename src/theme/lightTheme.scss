@@ -1,0 +1,55 @@
+:root[data-theme="light"] {
+    --new-primary-text-color: #FFFFFF;
+    --new-primary-white-color: #FFFFFF;
+  
+    // 全局主色
+    --new-primary-color: #3591F4;
+    --new-primary-color1: rgba(53, 145, 244, 0.1);
+    --new-primary-color2: rgba(53, 145, 244, 0.08);
+    // 链接色
+    --new-link-color: var(--new-primary-color);
+    // 成功色
+    --new-success-color: #0CAA43;
+    --new-success-color1: rgba(12, 170, 67, 0.1);
+    // 警告色
+    --new-warning-color: #FFA00A;
+    --new-warning-color1: rgba(255, 160, 10, 0.1);
+    --new-warning-color2: rgba(255, 160, 10, 0.5);
+    // 错误色
+    --new-error-color: #F43835;
+    --new-error-color1: rgba(244, 56, 53, 0.1);
+    --new-error-color2: #F7615F;
+
+    --new-logo-color: #00B7BA;
+  
+    // 主文本色
+    --new-text-color: #363A45; 
+    // 次文本色
+    --new-text-color-secondary: #898D97; 
+  
+    // 白的背景
+    --new-bg-white-color: var(--new-primary-white-color);
+    --new-bg-grey-color: #F2F4F9;
+    --new-bg-grey-color1: var(--new-bg-grey-color);
+    --new-bg-black2-color: var(--new-primary-white-color);
+    --new-bg-hover-color: rgba(53, 145, 244, 0.1);
+    --new-bg-white-color1: rgba(255, 255, 255, 0.5);
+  
+    // 边框、输入框、分割线
+    --new-border-color-base: #DDE6F0;
+    // icon
+    --new-icon-color: #CCD6DD;
+  
+  
+  
+    // 主字号
+    --new-font-size-base: 14px;
+  
+    // 组件/浮层圆角
+    --new-border-radius-base: 4px;
+    --new-modal-border-radius-base: 5px;
+  
+    // 阴影
+    --new-box-shadow-color: #000000;
+    --new-modal-box-shadow-color: 0px 4px 12px rgba(0, 0, 0, 0.3);
+}
