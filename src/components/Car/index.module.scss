@@ -1,0 +1,39 @@
+.carWraper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    .carInner {
+        flex: 1;
+    }
+
+    .operate {
+        flex-shrink: 0;
+        width: 400px;
+        background: var(--new-bg-grey-color);
+        border-left: 2px solid var(--new-border-color-base);
+        padding: 10px;
+        overflow-y: auto;
+
+        .black {
+            display: flex;
+            flex-direction: column;
+            background: var(--new-bg-white-color);
+            padding: 8px;
+            border-radius: 4px;
+
+            .title {
+                font-size: 16px;
+                line-height: 22px;
+                font-weight: 600;
+                color: var(--new-text-color);
+            }
+
+            .content {
+                display: flex;
+                flex-wrap: wrap;
+                margin-top: 10px;
+            }
+        }
+    }
+}

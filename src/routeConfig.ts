@@ -2,7 +2,8 @@ import {
     Home,
     HDR,
     HDRImg,
-    CubeTextureLoader
+    CubeTextureLoader,
+    Car
 } from '@/components'
 
 export const routeList: any = [
@@ -10,6 +11,7 @@ export const routeList: any = [
         path: '/',
         element: Home
     },
+
     {
         path: '/hdr',
         element: HDR
@@ -21,6 +23,11 @@ export const routeList: any = [
     {
         path: '/cubeTextureLoader',
         element: CubeTextureLoader
+    },
+
+    {
+        path: '/car',
+        element: Car
     },
 
     {

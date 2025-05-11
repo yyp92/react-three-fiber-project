@@ -21,5 +21,17 @@ export const list = [
                 pageUrl: 'cubeTextureLoader'
             },
         ]
+    },
+
+    {
+        title: '模型加载',
+        children: [
+            {
+                title: '汽车设置',
+                desc: '',
+                imgUrl: '/images/pic.jpg',
+                pageUrl: 'car'
+            },
+        ]
     }
 ]
