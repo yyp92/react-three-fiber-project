@@ -1,15 +1,21 @@
 import * as THREE from 'three'
 import { useEffect, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, useGLTF, Gltf } from '@react-three/drei';
+import {
+    OrbitControls,
+    Environment,
+    useGLTF,
+    Gltf,
+    SpotLight,
+} from '@react-three/drei';
 import { useControls } from 'leva'
-import {Button} from 'antd'
+import { Button } from 'antd'
 import { useLoader } from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 import styles from './index.module.scss'
 
-const carBodyColor = [
+const carBodyColorList = [
     {
         text: '海湾蓝',
         color: new THREE.Color(0x0077B5)
@@ -51,9 +57,7 @@ const carBodyColor = [
 
 export const Car = () => {
     const canvasRef = useRef<any>(null);
-    // 存储上一次的窗口宽度和高度
-    const [prevWidth, setPrevWidth] = useState(window.innerWidth);
-    const [prevHeight, setPrevHeight] = useState(window.innerHeight);
+    const [carBodyColor, setCarBodyColor] = useState<any>(carBodyColorList[0].text)
 
     const { ...props }: any = useControls(
         'Car Controls',
@@ -85,41 +89,35 @@ export const Car = () => {
     )
 
     const gltf = useGLTF('/models/su7.glb')
-    console.log('-----gltf', gltf)
+    // console.log('-----gltf', gltf)
 
 
-    // useEffect(() => {
-    //     gltf.scene.traverse((obj: any) => {
-    //         if (obj.name === 'DOOR1_8_30') {
-    //             // obj.material = {
-    //             //     ...obj.material,
-    //             //     color: 'red'
-    //             // }
+    useEffect(() => {
+        if (gltf) {
+            // 设置模型的旋转角度
+            gltf.scene.rotation.set(0, -Math.PI / 2, -Math.PI / 10)
 
-    //             const list = obj.children
-
-    //             // console.log('----list', Array.isArray(list))
-
-    //             for (const mesh of list) {
-    //                 if (mesh.children[0].material.name === "Car_body") {
-    //                     console.log('======mesh.children[0].material', mesh.children[0].material)
-    //                     mesh.children[0].material.color = new THREE.Color(0xff0000)
-    //                 }
-    //             }
-    //         }
-    //     })
-    // }, [gltf])
+            handleChangeCarBodyColor(carBodyColorList[0])
+        }
+    }, [gltf])
 
 
-    const handleChangeCarBodyColor = (value: any) => {
+    const handleChangeCarBodyColor = (item: any) => {
+        setCarBodyColor(item.text)
+
         gltf.scene.traverse((obj: any) => {
             if (obj.name === 'DOOR1_8_30') {
                 const list = obj.children
 
                 for (const mesh of list) {
+                    // * 汽车的车身
                     if (mesh.children[0].material.name === "Car_body") {
-                        console.log('======mesh.children[0].material', mesh.children[0].material)
-                        mesh.children[0].material.color = value
+                        // console.log('======mesh.children[0].material', mesh.children[0].material)
+                        mesh.children[0].material.color = item.color
+                        mesh.children[0].material.roughness = 0.1
+                        mesh.children[0].material.metalness = 0.5
+                        mesh.children[0].material.clearcoat = 1
+                        mesh.children[0].material.clearcoatRoughness = 0.05
                     }
                 }
             }
@@ -128,6 +126,95 @@ export const Car = () => {
 
 
 
+    // ******** 渲染 ********
+    const renderCanvas = () => {
+        return (
+            <Canvas>
+                <OrbitControls />
+
+                <Environment background>
+                    <mesh scale={100}>
+                        <sphereGeometry args={[1, 64, 64]} />
+                        <meshBasicMaterial color="#393939" side={THREE.BackSide} />
+                    </mesh>
+                </Environment>
+
+                <ambientLight
+                    intensity={5}
+                    color={0xffffff}
+                />
+
+                {/* <SpotLight
+                    position={[0, 5, 0]}
+
+                    // 散射角度，和水平线的夹角
+                    angle={Math.PI / 4}
+                    // 横向，聚光锥的半影衰减百分比
+                    penumbra={0.1}
+                    // 纵向，沿着光照距离的衰减量
+                    decay={2}
+
+                    color={0xffffff}
+                    intensity={2}
+
+                    castShadow={true}
+                /> */}
+
+                <directionalLight
+                    position={[0, 5, 0]}
+                    color={0xffffff}
+                    intensity={1}
+                />
+
+                <group>
+                    <primitive
+                        object={gltf.scene}
+                    />
+                </group>
+            </Canvas>
+        )
+    }
+
+    const renderOprate = () => {
+        return (
+            <div
+                className={styles.operate}
+            >
+                <div
+                    className={styles.operateTitle}
+                >汽车设置</div>
+
+                <div
+                    className={styles.operateInner}
+                >
+                    <div className={styles.black}>
+                        <div className={styles.title}>
+                            车身颜色: {carBodyColor}
+                        </div>
+
+                        <div className={styles.content}>
+                            {
+                                carBodyColorList.map((item: any) => {
+                                    return (
+                                        <Button
+                                            key={item.text}
+                                            style={{
+                                                marginRight: '8px',
+                                                marginBottom: '8px'
+                                            }}
+                                            type='primary'
+                                            onClick={() => handleChangeCarBodyColor(item)}
+                                        >{item.text}</Button>
+                                    )
+                                })
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div
             className={styles.carWraper}
@@ -135,50 +222,10 @@ export const Car = () => {
             <div
                 className={styles.carInner}
             >
-                <Canvas>
-                    <OrbitControls />
-
-                    <Environment background>
-                        <mesh scale={100}>
-                            <sphereGeometry args={[1, 64, 64]} />
-                            <meshBasicMaterial color="#393939" side={THREE.BackSide} />
-                        </mesh>
-                    </Environment>
-
-                    <ambientLight intensity={1} />
-
-                    <group>
-                        <primitive
-                            object={gltf.scene}
-                        />
-                    </group>
-                </Canvas>
+                {renderCanvas()}
             </div>
 
-            <div
-                className={styles.operate}
-            >
-                <div className={styles.black}>
-                    <div className={styles.title}>车身颜色</div>
-
-                    <div className={styles.content}>
-                        {
-                            carBodyColor.map((item: any) => {
-                                return (
-                                    <Button
-                                        style={{
-                                            marginRight: '8px',
-                                            marginBottom: '8px'
-                                        }}
-                                        type='primary'
-                                        onClick={() => handleChangeCarBodyColor(item.color)}
-                                    >{item.text}</Button>
-                                )
-                            })
-                        }
-                    </div>
-                </div>
-            </div>
+            {renderOprate()}
         </div>
     )
 }

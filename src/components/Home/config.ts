@@ -29,7 +29,7 @@ export const list = [
             {
                 title: '汽车设置',
                 desc: '',
-                imgUrl: '/images/pic.jpg',
+                imgUrl: '/images/car-su7.png',
                 pageUrl: 'car'
             },
         ]
