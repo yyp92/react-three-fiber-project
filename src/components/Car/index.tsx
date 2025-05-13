@@ -1,12 +1,14 @@
 import * as THREE from 'three'
+import { AxesHelper, GridHelper } from 'three';
 import { useEffect, useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, extend } from '@react-three/fiber';
 import {
     OrbitControls,
     Environment,
     useGLTF,
     Gltf,
     SpotLight,
+    useHelper
 } from '@react-three/drei';
 import { useControls } from 'leva'
 import { Button } from 'antd'
@@ -54,10 +56,39 @@ const carBodyColorList = [
     },
 ]
 
+const carDoorList = [
+    {
+        value: 'leftFront',
+        text: '左前'
+    },
+    {
+        value: 'leftBack',
+        text: '左后'
+    },
+    {
+        value: 'rightFront',
+        text: '右前'
+    },
+    {
+        value: 'rightBack',
+        text: '右后'
+    },
+]
 
+// @ts-ignore
+extend(() => {
+    return {
+        AxesHelper,
+        GridHelper
+    }
+})
+
+  
 export const Car = () => {
     const canvasRef = useRef<any>(null);
     const [carBodyColor, setCarBodyColor] = useState<any>(carBodyColorList[0].text)
+    const [openDoor, setOpenDoor] = useState<any>('')
+
 
     const { ...props }: any = useControls(
         'Car Controls',
@@ -95,7 +126,7 @@ export const Car = () => {
     useEffect(() => {
         if (gltf) {
             // 设置模型的旋转角度
-            gltf.scene.rotation.set(0, -Math.PI / 2, -Math.PI / 10)
+            // gltf.scene.rotation.set(0, -Math.PI / 2, -Math.PI / 10)
 
             handleChangeCarBodyColor(carBodyColorList[0])
         }
@@ -106,12 +137,12 @@ export const Car = () => {
         setCarBodyColor(item.text)
 
         gltf.scene.traverse((obj: any) => {
-            if (obj.name === 'DOOR1_8_30') {
-                const list = obj.children
+            const list = obj.children
 
+            if (obj.name.indexOf('DOOR') > -1) {
                 for (const mesh of list) {
                     // * 汽车的车身
-                    if (mesh.children[0].material.name === "Car_body") {
+                    if (mesh.children[0].material.name === 'Car_body') {
                         // console.log('======mesh.children[0].material', mesh.children[0].material)
                         mesh.children[0].material.color = item.color
                         mesh.children[0].material.roughness = 0.1
@@ -121,7 +152,54 @@ export const Car = () => {
                     }
                 }
             }
+
+            // 轮胎
+            if (obj.name === 'Wheel1001_12_55') {
+                for (const mesh of list) {
+                    if (mesh.children[0].material.name === 'M_Wheel_ALL.002') {
+                        mesh.children[0].material.color = new THREE.Color(0x333333)
+                        mesh.children[0].material.roughness = 0.8
+                        mesh.children[0].material.metalness = 0.2
+                    }
+                }
+            }
+
+            // logo
+            if (obj.name === 'logo3_4_11') {
+                for (const mesh of list) {
+                    if (mesh.children[0].material.name === 'M_ChePai.004') {
+                        // mesh.children[0].material.color = new THREE.Color(0x000000)
+                        mesh.children[0].material.roughness = 0.8
+                        mesh.children[0].material.metalness = 0.8
+                    }
+                    else if (mesh.children[0].material.name === 'M_LOGO.004' || mesh.name === 'Object_12_12') {
+                        mesh.children[0].material.color = new THREE.Color(0xcccccc)
+                        mesh.children[0].material.roughness = 0.2
+                        mesh.children[0].material.metalness = 0.8
+                    }
+                }
+            }
+
+            // 车灯
+            if (obj.name === 'OUTSIDE_6_17') {
+                for (const mesh of list) {
+                    // 前车灯
+                    if (mesh.children[0].material.name === 'Car_frontlight') {
+                        mesh.children[0].material.color = new THREE.Color(0xffff00)
+                        mesh.children[0].material.emissive = new THREE.Color(0xffff00)
+                        mesh.children[0].material.emissiveIntensity = 1000
+                    }
+                    // 后车灯
+                    else if (mesh.children[0].material.name === 'Car_backlight') {
+                        // console.log('mesh', mesh.children[0].material)
+                    }
+                }
+            }
         })
+    }
+
+    const handleChangeCarDoorOpenStatus = (item: any) => {
+        setOpenDoor(item.text)
     }
 
 
@@ -131,6 +209,9 @@ export const Car = () => {
         return (
             <Canvas>
                 <OrbitControls />
+
+                {/* 坐标轴辅助对象 */}
+                <axesHelper args={[5]} />
 
                 <Environment background>
                     <mesh scale={100}>
@@ -204,6 +285,30 @@ export const Car = () => {
                                             }}
                                             type='primary'
                                             onClick={() => handleChangeCarBodyColor(item)}
+                                        >{item.text}</Button>
+                                    )
+                                })
+                            }
+                        </div>
+                    </div>
+
+                    <div className={styles.black}>
+                        <div className={styles.title}>
+                            打开车门: {openDoor}
+                        </div>
+
+                        <div className={styles.content}>
+                            {
+                                carDoorList.map((item: any) => {
+                                    return (
+                                        <Button
+                                            key={item.text}
+                                            style={{
+                                                marginRight: '8px',
+                                                marginBottom: '8px'
+                                            }}
+                                            type='primary'
+                                            onClick={() => handleChangeCarDoorOpenStatus(item)}
                                         >{item.text}</Button>
                                     )
                                 })
