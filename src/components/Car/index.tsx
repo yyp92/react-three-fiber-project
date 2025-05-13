@@ -85,9 +85,9 @@ extend(() => {
 
   
 export const Car = () => {
-    const canvasRef = useRef<any>(null);
     const [carBodyColor, setCarBodyColor] = useState<any>(carBodyColorList[0].text)
-    const [openDoor, setOpenDoor] = useState<any>('')
+    const openDoor = useRef<string[]>([])
+    const [openDoorName, setOpenDoorName] = useState<any>('')
 
 
     const { ...props }: any = useControls(
@@ -198,8 +198,67 @@ export const Car = () => {
         })
     }
 
+
     const handleChangeCarDoorOpenStatus = (item: any) => {
-        setOpenDoor(item.text)
+        if (openDoor.current.includes(item.value)) {
+            openDoor.current = openDoor.current.filter((data: any) => data !== item.value)
+        }
+        else {
+            openDoor.current.push(item.value)
+        }
+        
+        setOpenDoorName(openDoor.current ? item.text : '')
+
+        gltf.scene.traverse((obj: any) => {
+            // 左前
+            if (obj.name === 'DOOR1_8_30') {
+                if (openDoor.current.includes('leftFront')) {
+                    obj.rotation.z = Math.PI / 2
+                    obj.position.x = -1.85
+                }
+                else {
+                    obj.rotation.z = 0
+                    obj.position.x = 0
+                }
+            }
+            // 左后
+            else if (obj.name === 'DOOR2_9_37') {
+                if (openDoor.current.includes('leftBack')) {
+                    obj.rotation.z = Math.PI / 2
+                    obj.position.x = -0.7
+                    obj.position.z = 1.15
+                }
+                else {
+                    obj.rotation.z = 0
+                    obj.position.x = 0
+                    obj.position.z = 0
+                }
+            }
+            // 右前
+            else if (obj.name === 'DOOR3_10_43') {
+                if (openDoor.current.includes('rightFront')) {
+                    obj.rotation.z = -Math.PI / 2
+                    obj.position.x = 1.85
+                }
+                else {
+                    obj.rotation.z = 0
+                    obj.position.x = 0
+                }
+            }
+            // 右后
+            else if (obj.name === 'DOOR4_11_50') {
+                if (openDoor.current.includes('rightBack')) {
+                    obj.rotation.z = -Math.PI / 2
+                    obj.position.x = 0.7
+                    obj.position.z = 1.15
+                }
+                else {
+                    obj.rotation.z = 0
+                    obj.position.x = 0
+                    obj.position.z = 0
+                }
+            }
+        })
     }
 
 
@@ -294,7 +353,7 @@ export const Car = () => {
 
                     <div className={styles.black}>
                         <div className={styles.title}>
-                            打开车门: {openDoor}
+                            打开车门
                         </div>
 
                         <div className={styles.content}>
@@ -308,7 +367,7 @@ export const Car = () => {
                                                 marginBottom: '8px'
                                             }}
                                             type='primary'
-                                            onClick={() => handleChangeCarDoorOpenStatus(item)}
+                                            onClick={() =>  handleChangeCarDoorOpenStatus(item)}
                                         >{item.text}</Button>
                                     )
                                 })
